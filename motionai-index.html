@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MotionAI — Image to Video</title>
+<style>
+:root{color-scheme:dark;--bg:#090b12;--panel:#111521;--line:#252b3b;--muted:#9aa4ba;--text:#f4f6ff;--accent:#9b7bff;--accent2:#55d6be}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 20% 0%,#201b3c 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;padding:20px clamp(16px,4vw,48px);border-bottom:1px solid #ffffff12;position:sticky;top:0;background:#090b12dd;backdrop-filter:blur(14px);z-index:5}
+.logo{display:flex;align-items:center;gap:11px;font-weight:800;font-size:20px;letter-spacing:-.5px}.logo-mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--accent),#55d6be);display:grid;place-items:center;color:#090b12;font-size:19px}
+.pill{font-size:12px;color:#baf7e9;border:1px solid #55d6be55;background:#55d6be12;border-radius:99px;padding:6px 10px}
+main{max-width:1200px;margin:0 auto;padding:36px 20px 70px}.hero{margin:8px 0 28px}.eyebrow{color:#b8a7ff;font-size:12px;text-transform:uppercase;letter-spacing:2px;font-weight:800}.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.08;letter-spacing:-1.8px;margin:10px 0}.hero p{color:var(--muted);max-width:700px;margin:0}
+.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:20px}.panel{background:linear-gradient(180deg,#151a29,#101420);border:1px solid var(--line);border-radius:20px;padding:20px;min-width:0}.panel h2{font-size:16px;margin:0 0 5px}.sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+.drop{border:1px dashed #4b536b;border-radius:15px;min-height:250px;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;position:relative;overflow:hidden;background:#0b0f19;cursor:pointer}.drop.drag{border-color:var(--accent);background:#9b7bff12}.drop img{max-width:100%;max-height:390px;object-fit:contain;border-radius:10px;display:block}.drop-content{max-width:310px}.upload-icon{width:52px;height:52px;border-radius:16px;margin:0 auto 12px;background:#9b7bff20;color:#c4b5fd;display:grid;place-items:center;font-size:25px}.drop strong{display:block;font-size:15px}.drop span{color:var(--muted);font-size:12px}.drop input{display:none}
+label{display:block;font-weight:650;font-size:13px;margin:19px 0 8px}textarea,select,input[type=number]{width:100%;background:#0b0f19;border:1px solid #30384c;border-radius:11px;color:var(--text);padding:12px 13px;font:inherit;outline:none}textarea{resize:vertical;min-height:105px}textarea:focus,select:focus{border-color:var(--accent)}.hint{font-size:12px;color:var(--muted);margin-top:7px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:12px}.buttons{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}.btn{border:0;border-radius:11px;padding:12px 16px;font-weight:750;font-size:14px;cursor:pointer;transition:.18s}.btn:disabled{opacity:.45;cursor:not-allowed}.primary{background:linear-gradient(110deg,#a78bfa,#6ee7d0);color:#0a0c13;flex:1}.secondary{background:#202638;border:1px solid #333b50;color:#e5e9f7}.btn:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.08)}
+.preview{background:#080b12;border:1px solid var(--line);border-radius:15px;min-height:300px;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.preview canvas{width:100%;height:100%;object-fit:contain;display:block}.empty-preview{text-align:center;padding:25px;color:var(--muted)}.empty-preview .big{font-size:38px;margin-bottom:8px}.preview-label{position:absolute;left:12px;top:12px;font-size:11px;background:#090b12cc;border:1px solid #ffffff20;padding:5px 8px;border-radius:7px}
+.status{margin-top:12px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px}.status strong{color:#c4b5fd;font-weight:650}.tip{margin-top:15px;padding:12px 13px;background:#9b7bff0d;border:1px solid #9b7bff28;border-radius:11px;color:#c4cbe0;font-size:12px}
+footer{text-align:center;color:#737d94;font-size:12px;margin-top:26px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.preview{min-height:240px}.panel{padding:16px}header{padding:15px 18px}}
+</style>
+</head>
+<body>
+<header><div class="logo"><div class="logo-mark">▶</div>MotionAI</div><div class="pill">✦ 100% gratuit · sans compte</div></header>
+<main>
+<section class="hero"><div class="eyebrow">Studio créatif · Image vers vidéo</div><h1>Donne du mouvement<br>à tes images.</h1><p>Importe une image, décris le mouvement que tu imagines, prévisualise l'animation et exporte une vidéo WebM directement depuis ton navigateur.</p></section>
+<div class="layout">
+<section class="panel">
+<h2>① Image source</h2><p class="sub">Choisis une photo, une illustration ou une image générée par IA.</p>
+<div class="drop" id="drop"><input type="file" id="file" accept="image/*"><div class="drop-content" id="dropContent"><div class="upload-icon">↥</div><strong>Dépose ton image ici</strong><span>ou clique pour parcourir tes fichiers · PNG, JPG, WebP</span></div></div>
+<label for="prompt">② Décris l'animation souhaitée</label>
+<textarea id="prompt" placeholder="Ex. : travelling lent vers le visage, cheveux qui bougent au vent, ambiance cinématique...">Mouvement de caméra lent vers l'avant, effet cinématique</textarea>
+<div class="hint">Le prompt aide à choisir un mouvement et des effets visuels. Cette version n'invente pas de nouveaux pixels comme un modèle d'IA générative.</div>
+<div class="controls"><div><label for="motion">Type de mouvement</label><select id="motion"><option value="auto">Déduire du prompt</option><option value="zoom">Zoom cinématique</option><option value="pan">Panoramique horizontal</option><option value="float">Flottement doux</option><option value="pulse">Respiration / pulsation</option><option value="shake">Caméra dynamique</option></select></div><div><label for="duration">Durée (secondes)</label><select id="duration"><option>4</option><option selected>6</option><option>8</option><option>10</option></select></div></div>
+<div class="controls"><div><label for="format">Format</label><select id="format"><option value="landscape">Paysage · 16:9</option><option value="portrait">Portrait · 9:16</option><option value="square">Carré · 1:1</option></select></div><div><label for="intensity">Intensité du mouvement</label><select id="intensity"><option value="subtle">Subtile</option><option value="normal" selected>Normale</option><option value="strong">Forte</option></select></div></div>
+<div class="buttons"><button class="btn primary" id="play" disabled>▶ Prévisualiser l'animation</button><button class="btn secondary" id="stop" disabled>Arrêter</button></div>
+</section>
+<section class="panel">
+<h2>③ Résultat</h2><p class="sub">Prévisualise ton animation puis exporte-la en vidéo.</p>
+<div class="preview" id="preview"><div class="empty-preview"><div class="big">✧</div><strong>Ton animation apparaîtra ici</strong><div class="hint">Importe une image pour commencer.</div></div><div class="preview-label">APERÇU EN DIRECT</div></div>
+<div class="status"><span id="status">En attente d'une image</span><strong id="timer">00:00 / 00:06</strong></div>
+<div class="buttons"><button class="btn primary" id="export" disabled>↓ Exporter la vidéo (.webm)</button></div>
+<div class="tip">💡 Astuce : un prompt comme « zoom lent, caméra qui monte » donnera un mouvement plus doux. Pour une vraie animation générative (parler, expressions faciales, liquides ou objets qui changent), il faut un modèle vidéo d'IA, dont l'exécution gratuite n'est pas garantie.</div>
+</section>
+</div>
+<footer>MotionAI · Le traitement de l'image se fait dans ton navigateur. Aucun fichier n'est envoyé à un serveur.</footer>
+</main>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const fileInput=$('file'),drop=$('drop'),dropContent=$('dropContent'),prompt=$('prompt'),motion=$('motion'),duration=$('duration'),format=$('format'),intensity=$('intensity');
+const playBtn=$('play'),stopBtn=$('stop'),exportBtn=$('export'),status=$('status'),timer=$('timer'),preview=$('preview');
+let img=null, sourceURL=null, canvas=null, ctx=null, raf=0, start=0, playing=false, recorder=null, chunks=[], recording=false, previewCanvas=null;
+function setStatus(s){status.textContent=s}
+function loadFile(file){
+ if(!file || !file.type.startsWith('image/')){setStatus('Choisis un fichier image valide.');return}
+ if(sourceURL)URL.revokeObjectURL(sourceURL); sourceURL=URL.createObjectURL(file); img=new Image();
+ img.onload=()=>{dropContent.innerHTML='';dropContent.style.maxWidth='100%';const el=document.createElement('img');el.src=sourceURL;el.alt='Image importée';dropContent.appendChild(el);playBtn.disabled=false;exportBtn.disabled=false;setStatus('Image chargée : '+file.name);setupCanvas();renderStill()};
+ img.onerror=()=>setStatus("Impossible de lire cette image.");img.src=sourceURL;
+}
+drop.addEventListener('click',()=>fileInput.click());fileInput.addEventListener('change',e=>loadFile(e.target.files[0]));
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag')}));
+drop.addEventListener('drop',e=>loadFile(e.dataTransfer.files[0]));
+function dimensions(){const f=format.value;return f==='portrait'?[720,1280]:f==='square'?[900,900]:[1280,720]}
+function setupCanvas(){if(!img)return;const [w,h]=dimensions();if(!canvas){preview.innerHTML='<canvas id="renderCanvas"></canvas><div class="preview-label">APERÇU EN DIRECT</div>';canvas=$('renderCanvas');ctx=canvas.getContext('2d')}canvas.width=w;canvas.height=h;canvas.style.width='100%';canvas.style.height='100%';}
+function selectedMotion(){if(motion.value!=='auto')return motion.value;const p=prompt.value.toLowerCase();if(/panoram|gauche|droite|horizontal/.test(p))return'pan';if(/flott|lévit|doux|vent/.test(p))return'float';if(/puls|respir/.test(p))return'pulse';if(/dynam|trembl|action|secoue/.test(p))return'shake';return'zoom'}
+function draw(t,staticFrame=false){
+ if(!img||!ctx)return;const W=canvas.width,H=canvas.height,elapsed=staticFrame?0:t/1000,secs=Math.max(1,Number(duration.value)),p=staticFrame?0:Math.min(1,elapsed/secs);
+ const intensity=intensityValue(),m=selectedMotion();let scale=1+0.04*intensity*p,dx=0,dy=0;
+ if(m==='zoom')scale=1+(0.10*intensity*p);
+ if(m==='pan'){scale=1.13;dx=(p-.5)*W*.12*intensity}
+ if(m==='float'){scale=1.09;dx=Math.sin(elapsed*1.2)*W*.012*intensity;dy=Math.sin(elapsed*1.7)*H*.018*intensity}
+ if(m==='pulse'){scale=1.04+Math.sin(elapsed*2.1)*.025*intensity;dy=Math.sin(elapsed*2.1)*H*.008*intensity}
+ if(m==='shake'){scale=1.12;dx=Math.sin(elapsed*12)*W*.012*intensity;dy=Math.cos(elapsed*15)*H*.01*intensity}
+ // Cover canvas while preserving the source aspect ratio.
+ const base=Math.max(W/img.width,H/img.height),sw=img.width*base,sh=img.height*base;
+ const dw=sw*scale,dh=sh*scale;const x=(W-dw)/2+dx,y=(H-dh)/2+dy;
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#080b12';ctx.fillRect(0,0,W,H);
+ ctx.save();ctx.filter='saturate(1.04) contrast(1.02)';ctx.drawImage(img,x,y,dw,dh);ctx.restore();
+ // Subtle cinematic vignette
+ const g=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.2,W/2,H/2,Math.max(W,H)*.72);g.addColorStop(0,'#00000000');g.addColorStop(1,'#02030a55');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ timer.textContent='00:'+String(Math.min(secs,Math.floor(elapsed))).padStart(2,'0')+' / 00:'+String(secs).padStart(2,'0');
+}
+function intensityValue(){return intensity.value==='subtle'?.55:intensity.value==='strong'?1.65:1}
+function renderStill(){if(img){setupCanvas();draw(0,true)}}
+function tick(now){if(!playing)return;if(!start)start=now;const elapsed=(now-start)/1000;draw(elapsed*1000);if(elapsed>=Number(duration.value)){playing=false;raf=0;stopBtn.disabled=true;playBtn.disabled=false;setStatus('Animation terminée');if(recording)finishRecording();return}raf=requestAnimationFrame(tick)}
+function startPlayback(isRecording=false){if(!img)return;cancelAnimationFrame(raf);setupCanvas();playing=true;start=0;recording=isRecording;playBtn.disabled=true;stopBtn.disabled=false;setStatus(isRecording?'Enregistrement de la vidéo…':'Animation en cours…');if(isRecording){chunks=[];const stream=canvas.captureStream(30);let mime='video/webm;codecs=vp9';if(!MediaRecorder.isTypeSupported(mime))mime='video/webm';try{recorder=new MediaRecorder(stream,{mimeType:mime})}catch(e){setStatus('Export vidéo non pris en charge par ce navigateur. Essaie Chrome ou Edge.');playing=false;recording=false;playBtn.disabled=false;stopBtn.disabled=true;return}recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};recorder.onstop=()=>{const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='motionai-animation.webm';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);setStatus('Vidéo exportée — vérifie tes téléchargements.');exportBtn.disabled=false};recorder.start()}
+raf=requestAnimationFrame(tick)}
+function finishRecording(){if(recorder&&recorder.state!=='inactive')recorder.stop();recording=false;stopBtn.disabled=true;playBtn.disabled=false}
+playBtn.addEventListener('click',()=>startPlayback(false));
+stopBtn.addEventListener('click',()=>{playing=false;cancelAnimationFrame(raf);raf=0;if(recording)finishRecording();else{playBtn.disabled=!img;stopBtn.disabled=true;setStatus('Animation arrêtée')}renderStill()});
+exportBtn.addEventListener('click',()=>{if(!img)return;if(!canvas.captureStream||!window.MediaRecorder){setStatus('Ton navigateur ne permet pas l’export WebM. Essaie Chrome ou Edge sur ordinateur.');return}startPlayback(true)});
+[format,intensity,motion,prompt,duration].forEach(el=>el.addEventListener('change',()=>{if(playing){playing=false;cancelAnimationFrame(raf)}if(img){setupCanvas();renderStill();playBtn.disabled=false;stopBtn.disabled=true;setStatus('Paramètres mis à jour')}}));
+})();
+</script>
+</body>
+</html>
